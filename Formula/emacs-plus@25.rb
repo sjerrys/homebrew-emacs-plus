@@ -7,7 +7,7 @@ class EmacsPlusAT25 < Formula
 
   bottle do
     root_url "https://dl.bintray.com/d12frosted/emacs-plus"
-    sha256 "223cb092edd4548e91545919c1445aa4961ef0b7e352d9249caa4fd5afa45f25" => :sierra
+    sha256 "223cb092edd4548e91545919c1445aa4961ef0b7e352d9249caa4fd5afa45f25" => :yosemite
     sha256 "a827b6be3b2cb6d164aac3498bac1db494caf8df9bb2f16df91c51b6e29267cf" => :high_sierra
   end
 
