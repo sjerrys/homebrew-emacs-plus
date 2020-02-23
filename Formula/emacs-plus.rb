@@ -1,236 +1,84 @@
-class PatchUrlResolver
-  def self.repo
-    ENV["HOMEBREW_GITHUB_REPOSITORY"] or "d12frosted/homebrew-emacs-plus"
-  end
-
-  def self.branch
-    ref = ENV["HOMEBREW_GITHUB_REF"]
-    if ref
-      ref.sub("refs/heads/", "")
-    else
-      "master"
-    end
-  end
-
-  def self.url name
-    "https://raw.githubusercontent.com/#{repo}/#{branch}/patches/#{name}.patch"
-  end
-end
-
 class EmacsPlus < Formula
   desc "GNU Emacs text editor"
   homepage "https://www.gnu.org/software/emacs/"
-  url "https://ftp.gnu.org/gnu/emacs/emacs-26.3.tar.xz"
-  mirror "https://ftpmirror.gnu.org/emacs/emacs-26.3.tar.xz"
-  sha256 "4d90e6751ad8967822c6e092db07466b9d383ef1653feb2f95c93e7de66d3485"
+  url "https://ftpmirror.gnu.org/emacs/emacs-25.1.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/emacs/emacs-25.1.tar.xz"
+  sha256 "19f2798ee3bc26c95dca3303e7ab141e7ad65d6ea2b6945eeba4dbea7df48f33"
 
   bottle do
-    root_url "https://dl.bintray.com/d12frosted/emacs-plus"
-    sha256 "6b59ea5c941b754f5008039be319e4437ebd66dc2e1a50fdf890cf226c078386" => :yosemite
-    sha256 "cb589861c8a697869107d1cbacc9cc920a8e7257b5c371b7e590b05e7e04c92c" => :catalina
+    rebuild 4
+    sha256 "c80ef281b85fb8a8bd65a84676056ea41d7bb2954d5c82193eef2acea2ade856" => :sierra
+    sha256 "5498bd9f8e027d8a77a8939d3468123313a57e67c3f08ad4d4f72bd1a95b3cbb" => :el_capitan
+    sha256 "8fa2c1f493b9dc831a017055b5de26b426925895c6400b24a3755e4db8b0ffa2" => :yosemite
   end
 
-  #
-  # Options
-  #
-
-  # Opt-out
-  option "without-cocoa",
-         "Build a non-Cocoa version of Emacs"
-  option "without-libxml2",
-         "Build without libxml2 support"
-  option "without-modules",
-         "Build without dynamic modules support"
-  option "without-spacemacs-icon",
-         "Build without Spacemacs icon by Nasser Alshammari"
-  option "without-multicolor-fonts",
-         "Build without a patch that enables multicolor font support"
-
-  # Opt-in
-  option "with-ctags",
-         "Don't remove the ctags executable that Emacs provides"
-  option "with-x11", "Experimental: build with x11 support"
-  option "with-no-titlebar", "Experimental: build without titlebar"
-  option "with-debug",
-         "Build with debug symbols and debugger friendly optimizations"
-
-  # Emacs 27.x only
-  option "with-xwidgets",
-         "Experimental: build with xwidgets support (--HEAD only)"
-  option "with-jansson",
-         "Build with jansson support (--HEAD only)"
-  option "with-emacs-27-branch",
-         "Build from emacs-27-branch (--HEAD only)"
-
-  # Update list from
-  # https://raw.githubusercontent.com/emacsfodder/emacs-icons-project/master/icons.json
-  #
-  # code taken from emacs-mac formula
-  emacs_icons_project_icons = {
-    "EmacsIcon1" => "50dbaf2f6d67d7050d63d987fe3743156b44556ab42e6d9eee92248c56011bd0",
-    "EmacsIcon2" => "8d63589b0302a67f13ab94b91683a8ad7c2b9e880eabe008056a246a22592963",
-    "EmacsIcon3" => "80dd2a4776739a081e0a42008e8444c729d41ba876b19fa9d33fde98ee3e0ebf",
-    "EmacsIcon4" => "8ce646ca895abe7f45029f8ff8f5eac7ab76713203e246b70dea1b8a21a6c135",
-    "EmacsIcon5" => "ca415df7ad60b0dc495626b0593d3e975b5f24397ad0f3d802455c3f8a3bd778",
-    "EmacsIcon6" => "12a1999eb006abac11535b7fe4299ebb3c8e468360faf074eb8f0e5dec1ac6b0",
-    "EmacsIcon7" => "f5067132ea12b253fb4a3ea924c75352af28793dcf40b3063bea01af9b2bd78c",
-    "EmacsIcon8" => "d330b15cec1bcdfb8a1e8f8913d8680f5328d59486596fc0a9439b54eba340a0",
-    "EmacsIcon9" => "f58f46e5ef109fff8adb963a97aea4d1b99ca09265597f07ee95bf9d1ed4472e",
-    "emacs-card-blue-deep" => "6bdb17418d2c620cf4132835cfa18dcc459a7df6ce51c922cece3c7782b3b0f9",
-    "emacs-card-british-racing-green" => "ddf0dff6a958e3b6b74e6371f1a68c2223b21e75200be6b4ac6f0bd94b83e1a5",
-    "emacs-card-carmine" => "4d34f2f1ce397d899c2c302f2ada917badde049c36123579dd6bb99b73ebd7f9",
-    "emacs-card-green" => "f94ade7686418073f04b73937f34a1108786400527ed109af822d61b303048f7",
-  }
-
-  emacs_icons_project_icons.keys.each do |icon|
-    option "with-emacs-icons-project-#{icon}", "Using Emacs icon project #{icon}"
+  devel do
+    url "https://alpha.gnu.org/gnu/emacs/pretest/emacs-25.2-rc2.tar.xz"
+    sha256 "4f405314b427f9fdfc3fe89c3a062524156b23e07396427bb16d30ba1a8bf687"
   end
-
-  option "with-modern-icon", "Using a modern style Emacs icon by @tpanum"
-
-  option "with-no-frame-refocus", "Disables frame re-focus (ie. closing one frame does not refocus another one)"
-
-  # Deprecated options
-  deprecated_option "cocoa" => "with-cocoa"
-  deprecated_option "keep-ctags" => "with-ctags"
-  deprecated_option "with-d-bus" => "with-dbus"
-  deprecated_option "with-no-title-bars" => "with-no-titlebar"
-
-  #
-  # URLs
-  #
 
   head do
-    if build.with? "emacs-27-branch"
-      url "https://github.com/emacs-mirror/emacs.git", :branch => "emacs-27"
-    else
-      url "https://github.com/emacs-mirror/emacs.git"
-    end
-  end
+    url "https://github.com/emacs-mirror/emacs.git"
 
-  #
-  # Dependencies
-  #
-
-  head do
     depends_on "autoconf" => :build
-    depends_on "gnu-sed" => :build
+    depends_on "automake" => :build
     depends_on "texinfo" => :build
   end
 
+  option "without-cocoa", "Build a non-Cocoa version of Emacs"
+  option "without-libxml2", "Build without libxml2 support"
+  option "without-modules", "Build without dynamic modules support"
+  option "without-spacemacs-icon", "Build without Spacemacs icon by Nasser Alshammari"
+  option "with-ctags", "Don't remove the ctags executable that Emacs provides"
+  option "without-multicolor-fonts", "Build without a patch that enables multicolor font support"
+  option "with-no-title-bars",
+         "Build with a patch for no title bars on frames (neither --HEAD nor --devel currently " \
+         "supported)"
+  option "with-natural-title-bar", "Use a title bar colour inferred by your theme (--HEAD is supported)"
+
+  deprecated_option "cocoa" => "with-cocoa"
+  deprecated_option "keep-ctags" => "with-ctags"
+  deprecated_option "with-d-bus" => "with-dbus"
+
   depends_on "pkg-config" => :build
-  depends_on "little-cms2" => :recommended
   depends_on :x11 => :optional
   depends_on "dbus" => :optional
   depends_on "gnutls" => :recommended
   depends_on "librsvg" => :recommended
+  depends_on "imagemagick" => :recommended
   depends_on "mailutils" => :optional
-
-  if build.head?
-    # Emacs 27.x (current HEAD) does support ImageMagick 7
-    depends_on "imagemagick@7" => :recommended
-    depends_on "imagemagick@6" => :optional
-  else
-    # Emacs 26.x does not support ImageMagick 7:
-    # Reported on 2017-03-04: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25967
-    depends_on "imagemagick@6" => :recommended
-  end
-
-  depends_on "jansson" => :optional
 
   if build.with? "x11"
     depends_on "freetype" => :recommended
     depends_on "fontconfig" => :recommended
   end
 
-  #
-  # Incompatible options
-  #
-
-  if build.with? "emacs-27-branch"
-    unless build.head?
-      odie "--with-emacs-27-branch is supported only on --HEAD"
-    end
-  end
-
-  if build.with? "xwidgets"
-    unless build.head?
-      odie "--with-xwidgets is supported only on --HEAD"
-    end
-    unless build.with? "cocoa"
-      odie "--with-xwidgets is supported only on cocoa via xwidget webkit"
-    end
-  end
-
-  #
-  # Patches
-  #
-
-  if build.with? "no-titlebar"
-    if build.with? "emacs-27-branch"
-      patch do
-        url (PatchUrlResolver.url "no-titlebar-emacs-27")
-        sha256 "fdf8dde63c2e1c4cb0b02354ce7f2102c5f8fd9e623f088860aee8d41d7ad38f"
-      end
-    elsif build.head?
-      patch do
-        url (PatchUrlResolver.url "no-titlebar-head")
-        sha256 "d4645c7d2ca42b5e6fb45e1da8d98a5ed6bf126455f9e7118e2cc650c5df174c"
-      end
-    else
-      patch do
-        url (PatchUrlResolver.url "no-titlebar-release")
-        sha256 "2059213cc740a49b131a363d6093913fa29f8f67227fc86a82ffe633bbf1a5f5"
-      end
-    end
-  end
-
   if build.with? "multicolor-fonts"
-    unless build.head?
-      patch do
-        url (PatchUrlResolver.url "multicolor-fonts")
-        sha256 "7597514585c036c01d848b1b2cc073947518522ba6710640b1c027ff47c99ca7"
-      end
-    end
-  end
-
-  if build.with? "xwidgets"
     patch do
-      url (PatchUrlResolver.url "xwidgets_webkit_in_cocoa")
-      sha256 "6376e9e40686077b67c0e21115f0aa451b63ea5d8ee996a69f95cb3f693c9174"
+      url "https://gist.githubusercontent.com/aatxe/260261daf70865fbf1749095de9172c5/raw/214b50c62450be1cbee9f11cecba846dd66c7d06/patch-multicolor-font.diff"
+      sha256 "5af2587e986db70999d1a791fca58df027ccbabd75f45e4a2af1602c75511a8c"
     end
   end
 
-  if build.with? "no-frame-refocus"
+  # borderless patch
+  # remove once it's merged to Emacs
+  # more info here: https://lists.gnu.org/archive/html/bug-gnu-emacs/2016-10/msg00072.html
+  if build.with? "no-title-bars"
+    if build.head? or build.devel?
+      odie "--with-no-title-bars not currently supported on --devel, nor on --HEAD " \
+           "(because the patch as written does not successfully apply)."
+    end
+
     patch do
-      url (PatchUrlResolver.url "no-frame-refocus-cocoa")
-      sha256 "a140fa44eab0cf47b4fcc8cfb96132a8b40a4ba37b2e84b8c78129dbf6ca632c"
+      url "https://gitlab.com/brds/GNU-Emacs-OS-X-no-title-bar/raw/master/GNU-Emacs-25.1-OS-X-no-title-bar.patch"
+      sha256 "51b9bbe4c731e7f5b391fdae98cf5c946b77e45b8dc25317cdd00e4180c72241"
     end
   end
 
-  patch do
-    url (PatchUrlResolver.url "fix-window-role")
-    sha256 "ae92602a95564efe1aecec85563b116bf4211371a7c1f7e5d9c356107b4adf6d"
-  end
-
-  #
-  # Icons
-  #
-
-  resource "modern-icon" do
-    url "https://s3.amazonaws.com/emacs-mac-port/Emacs.icns.modern"
-    sha256 "eb819de2380d3e473329a4a5813fa1b4912ec284146c94f28bd24fbb79f8b2c5"
-  end
-
-  resource "spacemacs-icon" do
-    url "https://github.com/nashamri/spacemacs-logo/blob/master/spacemacs.icns?raw=true"
-    sha256 "b3db8b7cfa4bc5bce24bc4dc1ede3b752c7186c7b54c09994eab5ec4eaa48900"
-  end
-
-  emacs_icons_project_icons.each do |icon, sha|
-    resource "emacs-icons-project-#{icon}" do
-      url "https://raw.githubusercontent.com/emacsfodder/emacs-icons-project/master/#{icon}.icns"
-      sha256 sha
+  if build.with? "natural-title-bar"
+    patch do
+      url "https://gist.githubusercontent.com/jwintz/853f0075cf46770f5ab4f1dbf380ab11/raw/bc30bd2e9a7bf6873f3a3e301d0085bcbefb99b0/emacs_dark_title_bar.patch"
+      sha256 "742f7275f3ada695e32735fa02edf91a2ae7b1fa87b7e5f5c6478dd591efa162"
     end
   end
 
@@ -249,10 +97,6 @@ class EmacsPlus < Formula
       args << "--without-xml2"
     end
 
-    if build.with? "debug"
-      ENV.append "CFLAGS", "-g -Og"
-    end
-
     if build.with? "dbus"
       args << "--with-dbus"
     else
@@ -265,40 +109,10 @@ class EmacsPlus < Formula
       args << "--without-gnutls"
     end
 
-    # Note that if ./configure is passed --with-imagemagick but can't find the
-    # library it does not fail but imagemagick support will not be available.
-    # See: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=24455
-    if build.with?("imagemagick@6") || build.with?("imagemagick@7")
-      args << "--with-imagemagick"
-    else
-      args << "--without-imagemagick"
-    end
-
-    # Emacs 27.x (current HEAD) supports imagemagick7 but not Emacs 26.x
-    if build.with? "imagemagick@7"
-      imagemagick_lib_path =  Formula["imagemagick@7"].opt_lib/"pkgconfig"
-      unless build.head?
-        odie "--with-imagemagick@7 is supported only on --HEAD"
-      end
-      ohai "ImageMagick PKG_CONFIG_PATH: ", imagemagick_lib_path
-      ENV.prepend_path "PKG_CONFIG_PATH", imagemagick_lib_path
-    elsif build.with? "imagemagick@6"
-      imagemagick_lib_path =  Formula["imagemagick@6"].opt_lib/"pkgconfig"
-      ohai "ImageMagick PKG_CONFIG_PATH: ", imagemagick_lib_path
-      ENV.prepend_path "PKG_CONFIG_PATH", imagemagick_lib_path
-    end
-
-    if build.with? "jansson"
-      unless build.head?
-        odie "--with-jansson is supported only on --HEAD"
-      end
-      args << "--with-json"
-    end
-
+    args << "--with-imagemagick" if build.with? "imagemagick"
     args << "--with-modules" if build.with? "modules"
     args << "--with-rsvg" if build.with? "librsvg"
     args << "--without-pop" if build.with? "mailutils"
-    args << "--with-xwidgets" if build.with? "xwidgets"
 
     if build.head?
       ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
@@ -307,45 +121,28 @@ class EmacsPlus < Formula
 
     if build.with? "cocoa"
       args << "--with-ns" << "--disable-ns-self-contained"
+    else
+      args << "--without-ns"
+    end
 
-      system "./configure", *args
+    system "./configure", *args
+    system "make"
+    system "make", "install"
 
-      # Disable aligned_alloc on Mojave. See issue: https://github.com/daviderestivo/homebrew-emacs-head/issues/15
-      if MacOS.version <= :mojave
-        ohai "Force disabling of aligned_alloc on macOS <= Mojave"
-        configure_h_filtered = File.read("src/config.h")
-                                 .gsub("#define HAVE_ALIGNED_ALLOC 1", "#undef HAVE_ALIGNED_ALLOC")
-                                 .gsub("#define HAVE_DECL_ALIGNED_ALLOC 1", "#undef HAVE_DECL_ALIGNED_ALLOC")
-                                 .gsub("#define HAVE_ALLOCA 1", "#undef HAVE_ALLOCA")
-                                 .gsub("#define HAVE_ALLOCA_H 1", "#undef HAVE_ALLOCA_H")
-        File.open("src/config.h", "w") do |f|
-          f.write(configure_h_filtered)
-        end
-      end
-
-      system "make"
-      system "make", "install"
-
-      icons_dir = buildpath/"nextstep/Emacs.app/Contents/Resources"
-
-      (%w[EmacsIcon1 EmacsIcon2 EmacsIcon3 EmacsIcon4
-        EmacsIcon5 EmacsIcon6 EmacsIcon7 EmacsIcon8
-        EmacsIcon9 emacs-card-blue-deep emacs-card-british-racing-green
-        emacs-card-carmine emacs-card-green].map { |i| "emacs-icons-project-#{i}" } +
-       %w[modern-icon spacemacs-icon]).each do |icon|
-        next if build.without? icon
-
-        rm "#{icons_dir}/Emacs.icns"
-        resource(icon).stage do
-          icons_dir.install Dir["*.icns*"].first => "Emacs.icns"
-        end
+    if build.with? "cocoa"
+      # icons
+      if build.with? "spacemacs-icon"
+        icon_file = "nextstep/Emacs.app/Contents/Resources/Emacs.icns"
+        spacemacs_icons = "https://github.com/nashamri/spacemacs-logo/blob/master/spacemacs.icns?raw=true"
+        rm "#{icon_file}"
+        curl "-L", "#{spacemacs_icons}", "-o", "#{icon_file}"
       end
 
       prefix.install "nextstep/Emacs.app"
 
       # Replace the symlink with one that avoids starting Cocoa.
       (bin/"emacs").unlink # Kill the existing symlink
-      (bin/"emacs").write <<~EOS
+      (bin/"emacs").write <<-EOS.undent
         #!/bin/bash
         exec #{prefix}/Emacs.app/Contents/MacOS/Emacs "$@"
       EOS
@@ -363,20 +160,6 @@ class EmacsPlus < Formula
       args << "--without-ns"
 
       system "./configure", *args
-
-      # Disable aligned_alloc on Mojave. See issue: https://github.com/daviderestivo/homebrew-emacs-head/issues/15
-      if MacOS.version <= :mojave
-        ohai "Force disabling of aligned_alloc on macOS <= Mojave"
-        configure_h_filtered = File.read("src/config.h")
-                                 .gsub("#define HAVE_ALIGNED_ALLOC 1", "#undef HAVE_ALIGNED_ALLOC")
-                                 .gsub("#define HAVE_DECL_ALIGNED_ALLOC 1", "#undef HAVE_DECL_ALIGNED_ALLOC")
-                                 .gsub("#define HAVE_ALLOCA 1", "#undef HAVE_ALLOCA")
-                                 .gsub("#define HAVE_ALLOCA_H 1", "#undef HAVE_ALLOCA_H")
-        File.open("src/config.h", "w") do |f|
-          f.write(configure_h_filtered)
-        end
-      end
-
       system "make"
       system "make", "install"
     end
@@ -391,7 +174,7 @@ class EmacsPlus < Formula
 
   plist_options manual: "emacs"
 
-  def plist; <<~EOS
+  def plist; <<-EOS.undent
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -401,35 +184,12 @@ class EmacsPlus < Formula
       <key>ProgramArguments</key>
       <array>
         <string>#{opt_bin}/emacs</string>
-        <string>--fg-daemon</string>
+        <string>--daemon</string>
       </array>
       <key>RunAtLoad</key>
       <true/>
-      <key>StandardOutPath</key>
-      <string>/tmp/homebrew.mxcl.emacs-plus.stdout.log</string>
-      <key>StandardErrorPath</key>
-      <string>/tmp/homebrew.mxcl.emacs-plus.stderr.log</string>
     </dict>
     </plist>
-    EOS
-  end
-
-  def caveats
-    <<~EOS
-      Emacs.app was installed to:
-        #{prefix}
-
-      To link the application to default Homebrew App location:
-        ln -s #{prefix}/Emacs.app /Applications
-
-      --natural-title-bar option was removed from this formula, in order to
-        duplicate its effect add following line to your init.el file
-        (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-        (add-to-list 'default-frame-alist '(ns-appearance . dark))
-      or:
-        (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-        (add-to-list 'default-frame-alist '(ns-appearance . light))
-
     EOS
   end
 
