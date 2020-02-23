@@ -123,7 +123,6 @@ class EmacsPlus < Formula
   depends_on :x11 => :optional
   depends_on "dbus" => :optional
   depends_on "gnutls" => :recommended
-  depends_on "librsvg" => :recommended
   depends_on "mailutils" => :optional
 
   if build.head?
